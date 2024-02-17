@@ -14,4 +14,10 @@ public class DefaultExceptionHandler {
     public ErrorResponse handleUserNotFoundException(UserNotFoundException exception) {
         return ErrorResponse.builder().message(exception.getMessage()).status("404").build();
     }
+
+    @ExceptionHandler( value = {CannotGetRepoBranchesException.class, ConnectionFailedException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleApiExceptions(UserNotFoundException exception) {
+        return ErrorResponse.builder().message(exception.getMessage()).status("500").build();
+    }
 }
