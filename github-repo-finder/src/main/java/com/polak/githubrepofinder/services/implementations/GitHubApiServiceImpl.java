@@ -23,7 +23,7 @@ public class GitHubApiServiceImpl implements GitHubApiService {
         try {
             this.github = GitHub.connectAnonymously();
         } catch (IOException e) {
-            throw new ConnectionFailedException("Failed to connect to GitHub.");
+            throw new ConnectionFailedException("Failed while connecting to GitHub.");
         }
     }
 
