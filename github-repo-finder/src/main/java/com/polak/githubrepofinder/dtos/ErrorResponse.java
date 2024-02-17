@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserNotFoundResponse {
+public class ErrorResponse {
     String status;
     String message;
 }
