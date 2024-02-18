@@ -7,6 +7,7 @@ import com.polak.githubrepofinder.exceptions.CannotGetRepoBranchesException;
 import com.polak.githubrepofinder.exceptions.ConnectionFailedException;
 import com.polak.githubrepofinder.exceptions.UserNotFoundException;
 import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
+import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -16,16 +17,9 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GitHubApiServiceImpl implements GitHubApiService {
     private final GitHub github;
-
-    public GitHubApiServiceImpl() throws ConnectionFailedException {
-        try {
-            this.github = GitHub.connectAnonymously();
-        } catch (IOException e) {
-            throw new ConnectionFailedException("Failed while connecting to GitHub.");
-        }
-    }
 
     @Override
     public RepositoriesResponse getUserRepositories(String username) throws UserNotFoundException {
