@@ -4,7 +4,6 @@ import com.polak.githubrepofinder.dtos.BranchDto;
 import com.polak.githubrepofinder.dtos.RepositoriesResponse;
 import com.polak.githubrepofinder.dtos.RepositoryDto;
 import com.polak.githubrepofinder.exceptions.CannotGetRepoBranchesException;
-import com.polak.githubrepofinder.exceptions.ConnectionFailedException;
 import com.polak.githubrepofinder.exceptions.UserNotFoundException;
 import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
 import lombok.RequiredArgsConstructor;
