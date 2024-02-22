@@ -1,8 +1,6 @@
 package com.polak.githubrepofinder.controllers;
 
-import com.polak.githubrepofinder.dtos.GitHubRepository;
 import com.polak.githubrepofinder.dtos.RepositoriesRequest;
-import com.polak.githubrepofinder.dtos.RepositoriesResponse;
 import com.polak.githubrepofinder.dtos.RepositoryDto;
 import com.polak.githubrepofinder.exceptions.UserNotFoundException;
 import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
@@ -11,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 
 @RestController
