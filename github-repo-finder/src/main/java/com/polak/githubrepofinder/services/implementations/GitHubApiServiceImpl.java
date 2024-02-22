@@ -4,11 +4,15 @@ import com.polak.githubrepofinder.dtos.BranchDto;
 import com.polak.githubrepofinder.dtos.GitHubBranch;
 import com.polak.githubrepofinder.dtos.GitHubRepository;
 import com.polak.githubrepofinder.dtos.RepositoryResponse;
+import com.polak.githubrepofinder.exceptions.UserNotFoundException;
 import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
@@ -42,8 +46,10 @@ public class GitHubApiServiceImpl implements GitHubApiService {
                 githubClient.get()
                            .uri("/users/{username}/repos", username)
                            .retrieve()
+                           .onStatus(HttpStatus.NOT_FOUND::equals, response -> Mono.just(new UserNotFoundException(String.format("User with username: {%s} not found.", username))))
                            .bodyToFlux(GitHubRepository.class)
                            .filter(repo -> !repo.fork());
+
     }
 
     private Flux<GitHubBranch> getRepositoryBranches(String username, String repoName) {
