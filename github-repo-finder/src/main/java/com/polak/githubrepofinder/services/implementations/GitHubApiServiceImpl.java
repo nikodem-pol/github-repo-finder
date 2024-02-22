@@ -24,7 +24,8 @@ public class GitHubApiServiceImpl implements GitHubApiService {
     public RepositoriesResponse getUserRepositories(String username) throws UserNotFoundException {
         try {
             GHUser user = github.getUser(username);
-            return RepositoriesResponse.builder().repositories(getNotForkRepositories(user)).build();
+            return
+                    RepositoriesResponse.builder().repositories(getNotForkRepositories(user)).build();
         } catch (IOException e) {
             throw new UserNotFoundException(String.format("User with name: {%s}, not found", username));
         }
@@ -37,14 +38,16 @@ public class GitHubApiServiceImpl implements GitHubApiService {
                                               .filter(repo -> !repo.isFork())
                                               .toList();
 
-        return notForkRepos.stream().map(this::convertGHRepositoryToRepositoryDto).toList();
+        return
+                notForkRepos.stream().map(this::convertGHRepositoryToRepositoryDto).toList();
     }
 
 
     private RepositoryDto convertGHRepositoryToRepositoryDto(GHRepository repository) {
         List<BranchDto> branches;
         branches = getRepositoryBranchesDtos(repository);
-        return RepositoryDto.builder()
+        return
+                RepositoryDto.builder()
                             .name(repository.getName())
                             .ownerLogin(repository.getOwnerName())
                             .branches(branches)
@@ -53,7 +56,8 @@ public class GitHubApiServiceImpl implements GitHubApiService {
 
     private List<BranchDto> getRepositoryBranchesDtos(GHRepository repository) {
         try {
-            return repository.getBranches()
+            return
+                    repository.getBranches()
                              .values()
                              .stream()
                              .map(branch -> BranchDto.builder()
