@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 
 @RestController
@@ -18,7 +19,7 @@ public class GitHubController {
 
     @PostMapping(value = "/repos", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public RepositoriesResponse getUsersRepositories(@RequestBody @Valid RepositoriesRequest request) throws UserNotFoundException {
+    public Mono<RepositoriesResponse> getUsersRepositories(@RequestBody @Valid RepositoriesRequest request) throws UserNotFoundException {
         return gitHubApiService.getUserRepositories(request.getUsername());
     }
 }
