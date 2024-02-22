@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GitHub;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 
@@ -11,12 +12,7 @@ import java.io.IOException;
 @Slf4j
 public class GitHubConfig {
     @Bean
-    GitHub github() {
-        try {
-            return GitHub.connectAnonymously();
-        } catch (IOException e) {
-            log.error("Failed to connect to GitHub API.");
-            throw new RuntimeException(e.getMessage());
-        }
+    WebClient github() {
+        return WebClient.create("https://");
     }
 }
