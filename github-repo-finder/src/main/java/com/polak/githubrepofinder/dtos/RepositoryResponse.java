@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RepositoryDto {
+public class RepositoryResponse {
     String name;
     String ownerLogin;
     List<BranchDto> branches;

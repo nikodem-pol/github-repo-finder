@@ -1,7 +1,7 @@
 package com.polak.githubrepofinder.controllers;
 
 import com.polak.githubrepofinder.dtos.RepositoriesRequest;
-import com.polak.githubrepofinder.dtos.RepositoryDto;
+import com.polak.githubrepofinder.dtos.RepositoryResponse;
 import com.polak.githubrepofinder.exceptions.UserNotFoundException;
 import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
 import jakarta.validation.Valid;
@@ -19,7 +19,7 @@ public class GitHubController {
 
     @PostMapping(value = "/repos", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<RepositoryDto> getUsersRepositories(@RequestBody @Valid RepositoriesRequest request) throws UserNotFoundException {
+    public Flux<RepositoryResponse> getUsersRepositories(@RequestBody @Valid RepositoriesRequest request) throws UserNotFoundException {
         return gitHubApiService.getUserRepositories(request.getUsername());
     }
 }

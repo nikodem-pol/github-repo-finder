@@ -3,7 +3,7 @@ package com.polak.githubrepofinder.services.implementations;
 import com.polak.githubrepofinder.dtos.BranchDto;
 import com.polak.githubrepofinder.dtos.GitHubBranch;
 import com.polak.githubrepofinder.dtos.GitHubRepository;
-import com.polak.githubrepofinder.dtos.RepositoryDto;
+import com.polak.githubrepofinder.dtos.RepositoryResponse;
 import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class GitHubApiServiceImpl implements GitHubApiService {
     private final WebClient githubClient;
 
     @Override
-    public Flux<RepositoryDto> getUserRepositories(String username) {
+    public Flux<RepositoryResponse> getUserRepositories(String username) {
         return getNonForkRepositories(username).publishOn(Schedulers.boundedElastic()).map(repo -> {
             List<BranchDto> branches = getRepositoryBranches(repo.owner().login(), repo.name())
                                                             .map(branch -> BranchDto.builder()
@@ -29,11 +29,11 @@ public class GitHubApiServiceImpl implements GitHubApiService {
                                                             .collectList()
                                                             .block();
             return
-                    RepositoryDto.builder()
-                                .name(repo.name())
-                                .ownerLogin(repo.owner().login())
-                                .branches(branches)
-                                .build();
+                    RepositoryResponse.builder()
+                                      .name(repo.name())
+                                      .ownerLogin(repo.owner().login())
+                                      .branches(branches)
+                                      .build();
         });
     }
 
