@@ -1,72 +1,57 @@
 package com.polak.githubrepofinder.services.implementations;
 
 import com.polak.githubrepofinder.dtos.BranchDto;
-import com.polak.githubrepofinder.dtos.RepositoriesResponse;
+import com.polak.githubrepofinder.dtos.GitHubBranch;
+import com.polak.githubrepofinder.dtos.GitHubRepository;
 import com.polak.githubrepofinder.dtos.RepositoryDto;
-import com.polak.githubrepofinder.exceptions.CannotGetRepoBranchesException;
-import com.polak.githubrepofinder.exceptions.UserNotFoundException;
 import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
 import lombok.RequiredArgsConstructor;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
-import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class GitHubApiServiceImpl implements GitHubApiService {
-    private final GitHub github;
+    private final WebClient githubClient;
 
     @Override
-    public RepositoriesResponse getUserRepositories(String username) throws UserNotFoundException {
-        try {
-            GHUser user = github.getUser(username);
+    public Flux<RepositoryDto> getUserRepositories(String username) {
+        return getNonForkRepositories(username).publishOn(Schedulers.boundedElastic()).map(repo -> {
+            List<BranchDto> branches = getRepositoryBranches(repo.owner().login(), repo.name())
+                                                            .map(branch -> BranchDto.builder()
+                                                                                    .name(branch.name())
+                                                                                    .lastCommitSha(branch.commit().sha())
+                                                                                    .build())
+                                                            .collectList()
+                                                            .block();
             return
-                    RepositoriesResponse.builder().repositories(getNotForkRepositories(user)).build();
-        } catch (IOException e) {
-            throw new UserNotFoundException(String.format("User with name: {%s}, not found", username));
-        }
+                    RepositoryDto.builder()
+                                .name(repo.name())
+                                .ownerLogin(repo.owner().login())
+                                .branches(branches)
+                                .build();
+        });
     }
 
-    private List<RepositoryDto> getNotForkRepositories(GHUser user) throws IOException {
-        List<GHRepository> notForkRepos = user.getRepositories()
-                                              .values()
-                                              .stream()
-                                              .filter(repo -> !repo.isFork())
-                                              .toList();
-
+    private Flux<GitHubRepository> getNonForkRepositories(String username) {
         return
-                notForkRepos.stream().map(this::convertGHRepositoryToRepositoryDto).toList();
+                githubClient.get()
+                           .uri("/users/{username}/repos", username)
+                           .retrieve()
+                           .bodyToFlux(GitHubRepository.class)
+                           .filter(repo -> !repo.fork());
     }
 
-
-    private RepositoryDto convertGHRepositoryToRepositoryDto(GHRepository repository) {
-        List<BranchDto> branches;
-        branches = getRepositoryBranchesDtos(repository);
+    private Flux<GitHubBranch> getRepositoryBranches(String username, String repoName) {
         return
-                RepositoryDto.builder()
-                            .name(repository.getName())
-                            .ownerLogin(repository.getOwnerName())
-                            .branches(branches)
-                            .build();
+                githubClient.get()
+                           .uri("/repos/{username}/{repoName}/branches", username, repoName)
+                           .retrieve()
+                           .bodyToFlux(GitHubBranch.class);
     }
 
-    private List<BranchDto> getRepositoryBranchesDtos(GHRepository repository) {
-        try {
-            return
-                    repository.getBranches()
-                             .values()
-                             .stream()
-                             .map(branch -> BranchDto.builder()
-                                                     .name(branch.getName())
-                                                     .lastCommitSha(branch.getSHA1())
-                                                     .build())
-                             .toList();
-        } catch (IOException e) {
-            throw new CannotGetRepoBranchesException(e.getMessage());
-        }
-    }
 }
