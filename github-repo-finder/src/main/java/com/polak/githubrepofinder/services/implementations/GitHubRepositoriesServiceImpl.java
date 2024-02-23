@@ -5,10 +5,9 @@ import com.polak.githubrepofinder.dtos.GitHubBranch;
 import com.polak.githubrepofinder.dtos.GitHubRepository;
 import com.polak.githubrepofinder.dtos.RepositoryResponse;
 import com.polak.githubrepofinder.exceptions.UserNotFoundException;
-import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
+import com.polak.githubrepofinder.services.interfaces.GitHubRepositoriesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -19,7 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class GitHubApiServiceImpl implements GitHubApiService {
+public class GitHubRepositoriesServiceImpl implements GitHubRepositoriesService {
     private final WebClient githubClient;
 
     @Override

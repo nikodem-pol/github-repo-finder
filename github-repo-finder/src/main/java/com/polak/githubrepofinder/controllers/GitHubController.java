@@ -3,7 +3,7 @@ package com.polak.githubrepofinder.controllers;
 import com.polak.githubrepofinder.dtos.RepositoriesRequest;
 import com.polak.githubrepofinder.dtos.RepositoryResponse;
 import com.polak.githubrepofinder.exceptions.UserNotFoundException;
-import com.polak.githubrepofinder.services.interfaces.GitHubApiService;
+import com.polak.githubrepofinder.services.interfaces.GitHubRepositoriesService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/api/v1/github")
 @RequiredArgsConstructor
 public class GitHubController {
-    private final GitHubApiService gitHubApiService;
+    private final GitHubRepositoriesService gitHubApiService;
 
     @PostMapping(value = "/repos", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
