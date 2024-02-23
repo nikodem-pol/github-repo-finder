@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class GitHubRepositoriesServiceImpl implements GitHubRepositoriesService {
@@ -18,19 +16,18 @@ public class GitHubRepositoriesServiceImpl implements GitHubRepositoriesService 
 
     @Override
     public Flux<RepositoryResponse> getUserRepositories(String username) {
-        return
-                gitHubApi.getNonForkRepositories(username)
-                         .publishOn(Schedulers.boundedElastic())
-                         .flatMap(repo -> gitHubApi.getRepositoryBranches(repo.owner().login(), repo.name())
-                                                   .map(branch -> BranchDto.builder()
-                                                                           .name(branch.name())
-                                                                           .lastCommitSha(branch.commit().sha())
-                                                                           .build())
-                                                   .collectList()
-                                                   .map(branches -> RepositoryResponse.builder()
-                                                                                      .name(repo.name())
-                                                                                      .ownerLogin(repo.owner().login())
-                                                                                      .branches(branches)
-                                                                                      .build()));
+        return gitHubApi.getNonForkRepositories(username)
+                        .publishOn(Schedulers.boundedElastic())
+                        .flatMap(repo -> gitHubApi.getRepositoryBranches(repo.owner().login(), repo.name())
+                                                  .map(branch -> BranchDto.builder()
+                                                                          .name(branch.name())
+                                                                          .lastCommitSha(branch.commit().sha())
+                                                                          .build())
+                                                  .collectList()
+                                                  .map(branches -> RepositoryResponse.builder()
+                                                                                     .name(repo.name())
+                                                                                     .ownerLogin(repo.owner().login())
+                                                                                     .branches(branches)
+                                                                                     .build()));
     }
 }
