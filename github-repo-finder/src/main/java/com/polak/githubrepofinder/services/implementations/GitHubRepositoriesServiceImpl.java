@@ -18,21 +18,19 @@ public class GitHubRepositoriesServiceImpl implements GitHubRepositoriesService 
 
     @Override
     public Flux<RepositoryResponse> getUserRepositories(String username) {
-        return gitHubApi.getNonForkRepositories(username).publishOn(Schedulers.boundedElastic()).map(repo -> {
-            List<BranchDto> branches = gitHubApi.getRepositoryBranches(repo.owner().login(), repo.name())
-                                                            .map(branch -> BranchDto.builder()
-                                                                                    .name(branch.name())
-                                                                                    .lastCommitSha(branch.commit().sha())
-                                                                                    .build())
-                                                            .collectList()
-                                                            .block();
-            return
-                    RepositoryResponse.builder()
-                                      .name(repo.name())
-                                      .ownerLogin(repo.owner().login())
-                                      .branches(branches)
-                                      .build();
-        });
+        return
+                gitHubApi.getNonForkRepositories(username)
+                         .publishOn(Schedulers.boundedElastic())
+                         .flatMap(repo -> gitHubApi.getRepositoryBranches(repo.owner().login(), repo.name())
+                                                   .map(branch -> BranchDto.builder()
+                                                                           .name(branch.name())
+                                                                           .lastCommitSha(branch.commit().sha())
+                                                                           .build())
+                                                   .collectList()
+                                                   .map(branches -> RepositoryResponse.builder()
+                                                                                      .name(repo.name())
+                                                                                      .ownerLogin(repo.owner().login())
+                                                                                      .branches(branches)
+                                                                                      .build()));
     }
-
 }
