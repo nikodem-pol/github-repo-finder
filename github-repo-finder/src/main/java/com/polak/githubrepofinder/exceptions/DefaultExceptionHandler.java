@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.support.WebExchangeBindException;
 
 import java.util.List;
 
@@ -20,9 +21,9 @@ public class DefaultExceptionHandler {
     }
 
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    @ExceptionHandler(value = WebExchangeBindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public List<String> handleValidationException(MethodArgumentNotValidException exception) {
+    public List<String> handleValidationException(WebExchangeBindException exception) {
         return exception
                 .getBindingResult()
                 .getFieldErrors()
