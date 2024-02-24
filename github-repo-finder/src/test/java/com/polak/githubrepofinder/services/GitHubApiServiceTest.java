@@ -25,7 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GitHubServiceTest {
+public class GitHubApiServiceTest {
 
     public static MockWebServer mockWebServer;
     private final ObjectMapper mapper = new ObjectMapper();
