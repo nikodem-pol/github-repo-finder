@@ -2,21 +2,26 @@ package com.polak.githubrepofinder.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.polak.githubrepofinder.dtos.GitHubBranch;
+import com.polak.githubrepofinder.dtos.GitHubCommit;
 import com.polak.githubrepofinder.dtos.GitHubRepository;
 import com.polak.githubrepofinder.dtos.GitHubRepositoryOwner;
 import com.polak.githubrepofinder.services.implementations.GitHubApiServiceImpl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.IOException;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GitHubServiceTest {
 
@@ -71,7 +76,30 @@ public class GitHubServiceTest {
     }
 
     @Test
-    void GitHubApiService_GetRepositoryBranches() {
+    void GitHubApiService_GetRepositoryBranches() throws JsonProcessingException, InterruptedException {
+        List<GitHubBranch> branches = gitHubBranchesTestData();
 
+        mockWebServer.enqueue(new MockResponse().setBody(mapper.writeValueAsString(branches))
+                                                .addHeader("Content-Type", "application/json"));
+
+        Flux<GitHubBranch> branchFlux = mockGitHubApiService.getRepositoryBranches("user", "Repo1");
+
+        StepVerifier.create(branchFlux)
+                    .expectNext(branches.toArray(GitHubBranch[]::new))
+                    .expectComplete()
+                    .verify();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals("GET", recordedRequest.getMethod());
+        assertEquals("/repos/user/Repo1/branches", recordedRequest.getPath());
+    }
+
+    private List<GitHubBranch> gitHubBranchesTestData() {
+        return List.of(
+                new GitHubBranch("Branch 1", new GitHubCommit("ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb")),
+                new GitHubBranch("Branch 2", new GitHubCommit("3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d")),
+                new GitHubBranch("Branch 3", new GitHubCommit("2e7d2c03a9507ae265ecf5b5356885a53393a2029d241394997265a1a25aefc6")),
+                new GitHubBranch("Branch 4", new GitHubCommit("18ac3e7343f016890c510e93f935261169d9e3f565436429830faf0934f4f8e4"))
+        );
     }
 }
