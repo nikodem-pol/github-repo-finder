@@ -6,10 +6,12 @@ import com.polak.githubrepofinder.dtos.GitHubBranch;
 import com.polak.githubrepofinder.dtos.GitHubCommit;
 import com.polak.githubrepofinder.dtos.GitHubRepository;
 import com.polak.githubrepofinder.dtos.GitHubRepositoryOwner;
+import com.polak.githubrepofinder.exceptions.UserNotFoundException;
 import com.polak.githubrepofinder.services.implementations.GitHubApiServiceImpl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,6 +75,21 @@ public class GitHubServiceTest {
                 new GitHubRepository("Repo 3", false, new GitHubRepositoryOwner("user")),
                 new GitHubRepository("Repo 4", true, new GitHubRepositoryOwner("user"))
         );
+    }
+
+    @Test
+    void GitHubApiService_GetNonForkRepositories_NotFound() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(404)
+                                                .addHeader("Content-Type", "application/json")
+                                                .setBody("User not found"));
+
+        Flux<GitHubRepository> repositoryFlux = mockGitHubApiService.getNonForkRepositories("user");
+
+        StepVerifier.create(repositoryFlux)
+                    .expectErrorSatisfies(error -> Assertions.assertThat(error)
+                                                             .isInstanceOf(UserNotFoundException.class)
+                                                             .hasMessage(error.getMessage()))
+                    .verify();
     }
 
     @Test
