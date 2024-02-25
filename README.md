@@ -1,5 +1,5 @@
 # GitHub Repositories Finder
-GitHub Repository Finder is an application thats lets users find detailed information about GitHub repositories belonging to a specific user. With this application, users can retrieve repository names, owner logins, branch names, and the last commit SHA for each branch. It is written in Java using Spring Boot framework with the use of [org.kohsuke.github-api](https://github-api.kohsuke.org/) library - an object oriented representation of the GitHub API for Java.
+GitHub Repository Finder is an application thats lets users find detailed information about GitHub repositories belonging to a specific user. With this application, users can retrieve repository names, owner logins, branch names, and the last commit SHA for each branch. It is written in Java using Spring Boot framework and it's WebFlux module to provide full reactivity.
 
 To start server run in terminal: `mvn spring-boot:run`. Server should start on  `http://localhost:8080`.
 
